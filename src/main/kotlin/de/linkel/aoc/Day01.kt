@@ -13,16 +13,17 @@ class Day01: AbstractLinesAdventDay<Long>() {
     private val whitespace = Regex("[ \t]+")
 
     override fun process(part: QuizPart, lines: Sequence<String>): Long {
-        val pairs = lines
+        val (lefts, rights) = lines
             .map { it.split(whitespace) }
             .map { Pair(it[0].toLong(), it[1].toLong()) }
             .toList()
-        val lefts = pairs.map { it.first }.sorted()
-        val rights = pairs.map { it.second }.sorted()
+            .unzip()
         return if (part == QuizPart.A)
-            lefts.zip(rights).sumOf { (l, r) -> abs(l - r) }
+            lefts.sorted().zip(rights.sorted())
+                .sumOf { (l, r) -> abs(l - r) }
         else {
-            val counts = rights.groupBy { it }.mapValues { it.value.count() }
+            val counts = rights
+                .groupingBy { it }.eachCount()
             lefts.sumOf { (counts[it]?:0) * it }
         }
     }
