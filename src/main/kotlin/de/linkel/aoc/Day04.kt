@@ -56,22 +56,20 @@ class Day04: AbstractLinesAdventDay<Long>() {
             char.also { if (char == 'A') aList.add(pos) }
         }
         return aList
-            .map { pos ->
-                pos to listOf(
-                    pos + Vector(-1,-1),
-                    pos + Vector(1,-1),
-                    pos + Vector(1,1),
-                    pos + Vector(-1,1),
+            .filter { pos -> listOf(
+                pos + Vector(-1,-1),
+                pos + Vector(1,-1),
+                pos + Vector(1,1),
+                pos + Vector(-1,1),
+            ).all { it in grid } }
+            .count { pos ->
+                listOf(
+                    Vector(1, 1) to Vector(-1, -1),
+                    Vector(-1, 1) to Vector(1, -1)
                 )
-            }
-            .filter { (_, neighbours) -> neighbours.all { it in grid } }
-            .count { (_, neighbours) ->
-                neighbours
-                    .map { grid[it] }
-                    .groupingBy { it }
-                    .eachCount()
-                    .let {
-                        it['M'] == 2 && it['S'] == 2
+                    .map { (a, b) -> setOf(grid[pos + a], grid[pos + b]) }
+                    .all {
+                        'M' in it && 'S' in it
                     }
             }
             .toLong()

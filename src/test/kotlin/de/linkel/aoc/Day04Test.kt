@@ -20,7 +20,7 @@ MXMXAXMASX
 //    override val exampleB = """
 //        """.trimIndent()
     override val exampleSolutionB = 9L
-    override val solutionB = 0L
+    override val solutionB = 1965L
 
     override val implementation = Day04()
 }
