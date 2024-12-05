@@ -2,11 +2,10 @@ package de.linkel.aoc
 
 import de.linkel.aoc.base.AbstractLinesAdventDay
 import de.linkel.aoc.base.QuizPart
+import de.linkel.aoc.utils.geometry.plain.discrete.Point
+import de.linkel.aoc.utils.geometry.plain.discrete.Vector
 import de.linkel.aoc.utils.grid.Grid
-import de.linkel.aoc.utils.grid.Point
-import de.linkel.aoc.utils.grid.Vector
 import jakarta.inject.Singleton
-import kotlin.math.pow
 
 @Singleton
 class Day04: AbstractLinesAdventDay<Long>() {
@@ -19,7 +18,7 @@ class Day04: AbstractLinesAdventDay<Long>() {
             partB(lines)
     }
 
-    fun partA(lines: Sequence<String>): Long {
+    private fun partA(lines: Sequence<String>): Long {
         val trails = mutableListOf<List<Pair<Point, Char>>>()
         val grid = Grid.parse(lines) { pos, char ->
             char.also { if (char == 'X') trails.add(listOf(pos to char)) }
@@ -27,7 +26,7 @@ class Day04: AbstractLinesAdventDay<Long>() {
         val results = mutableListOf<List<Pair<Point, Char>>>()
         while (trails.isNotEmpty()) {
             val trail = trails.removeFirst()
-            val (pos, char) = trail.last()
+            val (pos, _) = trail.last()
             if (trail.size == 1) {
                 grid.getNeighbours(pos, true).forEach { neighbour ->
                     if (neighbour.data == 'M') {
@@ -50,22 +49,22 @@ class Day04: AbstractLinesAdventDay<Long>() {
         return results.size.toLong()
     }
 
-    fun partB(lines: Sequence<String>): Long {
+    private fun partB(lines: Sequence<String>): Long {
         val aList = mutableSetOf<Point>()
         val grid = Grid.parse(lines) { pos, char ->
             char.also { if (char == 'A') aList.add(pos) }
         }
         return aList
             .filter { pos -> listOf(
-                pos + Vector(-1,-1),
-                pos + Vector(1,-1),
-                pos + Vector(1,1),
-                pos + Vector(-1,1),
+                pos + Vector.NORTH_EAST,
+                pos + Vector.NORTH_WEST,
+                pos + Vector.SOUTH_EAST,
+                pos + Vector.SOUTH_WEST,
             ).all { it in grid } }
             .count { pos ->
                 listOf(
-                    Vector(1, 1) to Vector(-1, -1),
-                    Vector(-1, 1) to Vector(1, -1)
+                    Vector.NORTH_EAST to Vector.SOUTH_WEST,
+                    Vector.NORTH_WEST to Vector.SOUTH_EAST
                 )
                     .map { (a, b) -> setOf(grid[pos + a], grid[pos + b]) }
                     .all {

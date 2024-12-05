@@ -36,7 +36,7 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:${kotlinVersion}")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.0-RC2")
     implementation("org.jgrapht:jgrapht-core:1.5.1")
-    implementation("de.linkel.aoc:aoc-utils:1.0.5")
+    implementation("de.linkel.aoc:aoc-utils:1.2.0")
     runtimeOnly("ch.qos.logback:logback-classic")
     runtimeOnly("com.fasterxml.jackson.module:jackson-module-kotlin")
     testImplementation("org.assertj:assertj-core:3.24.2")
