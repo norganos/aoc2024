@@ -8,10 +8,55 @@ import jakarta.inject.Singleton
 class Day05: AbstractLinesAdventDay<Long>() {
     override val day = 5
 
-    data class Buffer(
-        val rules: List<Pair<Long, Long>> = emptyList(),
-        val pages: List<List<Long>> = emptyList(),
-    )
+    class StoppingIterator<T>(
+        private val parent: Iterator<T>,
+        private val end: T
+    ): Iterator<T> {
+        private var buffer: T? = null
+        private var consumed: Boolean = true
+
+        init {
+            if (parent.hasNext()) {
+                buffer = parent.next()
+                if (buffer != end) {
+                    consumed = false
+                }
+            }
+        }
+
+        override fun hasNext(): Boolean {
+            return !consumed && buffer != end
+        }
+
+        override fun next(): T {
+            if (hasNext()) {
+                val result = buffer!!
+                if (parent.hasNext()) {
+                    buffer = parent.next()
+                } else {
+                    consumed = true
+                }
+                return result
+            } else throw NoSuchElementException()
+        }
+    }
+    class IteratorSequence<T>(
+        private val iterator: Iterator<T>
+    ): Sequence<T> {
+        private var consumed = false
+        override fun iterator(): Iterator<T> {
+            if (consumed) throw NoSuchElementException()
+            consumed = true
+            return iterator
+        }
+    }
+
+    fun <A,B,T> Sequence<T>.twoBlocks(delimiter: T, block1: (Sequence<T>) -> A, block2: (buffer: A, Sequence<T>) -> B): B {
+        val iterator = this.iterator()
+
+        val first = block1(IteratorSequence(StoppingIterator(iterator, delimiter)))
+        return block2(first, IteratorSequence(iterator))
+    }
 
     class PageComparator(
         rules: List<Pair<Long, Long>>
@@ -30,21 +75,15 @@ class Day05: AbstractLinesAdventDay<Long>() {
     }
 
     override fun process(part: QuizPart, lines: Sequence<String>): Long {
-        return lines.fold(Buffer()) { buffer, line ->
-            if (line.contains("|")) {
-                buffer.copy(
-                    rules = buffer.rules
-                            + (line.substringBefore("|").toLong() to line.substringAfterLast("|").toLong())
-                )
-            } else if (line.isNotEmpty()) {
-                buffer.copy(
-                    pages = buffer.pages + listOf(line.split(",").map(String::toLong))
-                )
-            } else buffer
-        }.let { buffer ->
-            val comparator = PageComparator(buffer.rules)
+        return lines.twoBlocks("", { rLines ->
+            rLines.map { line ->
+                line.substringBefore("|").toLong() to line.substringAfterLast("|").toLong()
+            }.toList()
+        }, { rules, pLines ->
+            val comparator = PageComparator(rules)
             if (part == QuizPart.A) {
-                buffer.pages
+                pLines
+                    .map { line -> line.split(",").map(String::toLong) }
                     .filter { pages ->
                         pages
                             .zipWithNext()
@@ -52,7 +91,8 @@ class Day05: AbstractLinesAdventDay<Long>() {
                     }
                     .sumOf { it[it.size / 2] }
             } else {
-                buffer.pages
+                pLines
+                    .map { line -> line.split(",").map(String::toLong) }
                     .mapNotNull { pages ->
                         pages
                             .sortedWith(comparator)
@@ -60,6 +100,6 @@ class Day05: AbstractLinesAdventDay<Long>() {
                     }
                     .sumOf { it[it.size / 2] }
             }
-        }
+        })
     }
 }
