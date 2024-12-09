@@ -65,21 +65,50 @@ class Day09: AbstractFileAdventDay<Long>() {
                     offset to list
                 }
             }.second.toMutableList()
-        while (true) {
-            while (disk.last() is FreeBlock) {
-                disk.removeLast()
+        if (part == QuizPart.A) {
+            while (true) {
+                while (disk.last() is FreeBlock) {
+                    disk.removeLast()
+                }
+                val freeIndex = disk.indexOfFirst { it is FreeBlock }
+                val fileIndex = disk.indexOfLast { it is FileBlock }
+                if (freeIndex == -1 || fileIndex == -1 || freeIndex > fileIndex)
+                    break
+                val file = disk.removeAt(fileIndex) as FileBlock
+                val free = disk.removeAt(freeIndex) as FreeBlock
+                val (insteadFree, insteadFile) = free.fillUp(file)
+                insteadFree.reversed().forEach { disk.add(freeIndex, it) }
+                insteadFile.forEach { disk.add(it) }
             }
-            val freeIndex = disk.indexOfFirst { it is FreeBlock }
-            val fileIndex = disk.indexOfLast { it is FileBlock }
-            if (freeIndex == -1 || fileIndex == -1 || freeIndex > fileIndex)
-                break
-            val file = disk.removeAt(fileIndex) as FileBlock
-            val free = disk.removeAt(freeIndex) as FreeBlock
-            val (insteadFree, insteadFile) = free.fillUp(file)
-            insteadFree.reversed().forEach { disk.add(freeIndex, it) }
-            insteadFile.forEach { disk.add(it) }
+        } else {
+            while (true) {
+                while (disk.last() is FreeBlock) {
+                    disk.removeLast()
+                }
+                var changed = false
+                for (fileIndex in disk.indices.reversed()) {
+                    if (changed) break
+                    if (disk[fileIndex] is FileBlock) {
+                        for (freeIndex in 0 until fileIndex) {
+                            if (disk[freeIndex] is FreeBlock) {
+                                if (disk[freeIndex].length >= disk[fileIndex].length) {
+                                    changed = true
+                                    val file = disk.removeAt(fileIndex) as FileBlock
+                                    val free = disk.removeAt(freeIndex) as FreeBlock
+                                    disk.add(freeIndex, FileBlock(free.startIndex, file.length, file.id))
+                                    if (free.length > file.length) {
+                                        disk.add(freeIndex + 1, FreeBlock(free.startIndex + file.length, free.length - file.length))
+                                    }
+                                    break
+                                }
+                            }
+                        }
+                    }
+                }
+                if (!changed)
+                    break
+            }
         }
-        println(disk.joinToString("") { it.toString() })
         return disk.sumOf { it.checksum() }
     }
 
