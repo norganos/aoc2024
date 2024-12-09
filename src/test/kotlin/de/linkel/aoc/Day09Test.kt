@@ -2,9 +2,13 @@ package de.linkel.aoc
 
 class Day09Test: AbstractDayTest<Long>() {
     override val exampleA = """
+2333133121414131402
         """.trimIndent()
-    override val exampleSolutionA = 0L
-    override val solutionA = 0L
+    /*
+    00...111...2...333.44.5555.6666.777.888899
+     */
+    override val exampleSolutionA = 1928L
+    override val solutionA = 6332189866718L
 
 
 //    override val exampleB = """
