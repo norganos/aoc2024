@@ -7,6 +7,7 @@ import jakarta.inject.Singleton
 @Singleton
 class Day11: AbstractLinesAdventDay<Long>() {
     override val day = 11
+    private val memory = mutableMapOf<Pair<Long, Int>, Long>()
 
     fun blink(value: Long): List<Long> {
         val strValue = value.toString()
@@ -21,17 +22,27 @@ class Day11: AbstractLinesAdventDay<Long>() {
             listOf(value * 2024L)
     }
 
+    fun blinkN(value: Long, iterations: Int): Long {
+        if (iterations < 0) throw IllegalArgumentException("Iterations must be positive.")
+        val key = (value to iterations)
+        if (key in memory) {
+            return memory[key]!!
+        }
+        val newValues = blink(value)
+        val result = if (iterations == 1) newValues.size.toLong()
+        else newValues.sumOf { blinkN(it, iterations - 1) }
+        memory[key] = result
+        return result
+    }
+
     private val whitespace = Regex("\\s+")
     override fun process(part: QuizPart, lines: Sequence<String>): Long {
-        return (if (part == QuizPart.A) (0 until 25) else (0 until 75))
-            .fold(
-                lines.flatMap { line ->
-                    line.split(whitespace).map { it.toLong() }
-                }
-                    .toList()
-            ) { stones, _ ->
-                stones.flatMap { blink(it) }
-            }
-            .size.toLong()
+        val iterations = (if (part == QuizPart.A) 25 else 75)
+        return lines.sumOf { line ->
+            line
+                .split(whitespace)
+                .map { it.toLong() }
+                .sumOf { blinkN(it, iterations) }
+        }
     }
 }

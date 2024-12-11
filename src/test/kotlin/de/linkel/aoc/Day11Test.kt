@@ -10,8 +10,8 @@ class Day11Test: AbstractDayTest<Long>() {
 
 //    override val exampleB = """
 //        """.trimIndent()
-    override val exampleSolutionB = 0L
-    override val solutionB = 0L
+    override val exampleSolutionB = 65601038650482L
+    override val solutionB = 221632504974231L
 
     override val implementation = Day11()
 }
