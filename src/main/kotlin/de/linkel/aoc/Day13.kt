@@ -2,8 +2,6 @@ package de.linkel.aoc
 
 import de.linkel.aoc.base.AbstractLinesAdventDay
 import de.linkel.aoc.base.QuizPart
-import de.linkel.aoc.utils.geometry.plain.discrete.Point
-import de.linkel.aoc.utils.geometry.plain.discrete.Vector
 import de.linkel.aoc.utils.iterables.split
 import jakarta.inject.Singleton
 import java.math.BigDecimal
