@@ -3,6 +3,8 @@ package de.linkel.aoc
 import de.linkel.aoc.base.AbstractLinesAdventDay
 import de.linkel.aoc.base.QuizPart
 import de.linkel.aoc.utils.iterables.split
+import de.linkel.aoc.utils.math.algebra.Equations
+import de.linkel.aoc.utils.math.algebra.Matrix
 import jakarta.inject.Singleton
 import java.math.BigDecimal
 
@@ -10,58 +12,17 @@ import java.math.BigDecimal
 class Day13: AbstractLinesAdventDay<BigDecimal>() {
     override val day = 13
 
-    private val buttonRegex = Regex("Button [AB]: X([-+]\\d+), Y([-+]\\d+)")
-    private val prizeRegex = Regex("Prize: X=(\\d+), Y=(\\d+)")
+    private val regex = Regex("(?:Prize|Button [AB]): X[=+](\\d+), Y[=+](\\d+)")
 
-    data class LongVector(
-        val x: BigDecimal,
-        val y: BigDecimal
-    ) {
-        operator fun plus(other: LongVector) = LongVector(x + other.x, y + other.y)
-        operator fun times(amount: BigDecimal) = LongVector(x * amount, y * amount)
-    }
-
-    data class Machine(
-        val a: LongVector,
-        val b: LongVector,
-        val p: LongVector
-    ) {
-        fun solve(): Play? {
-            fun det(a: BigDecimal, b: BigDecimal, c: BigDecimal, d: BigDecimal)
-                = a * d - b * c
-            return try {
-                val dab = det(a.x, b.x, a.y, b.y)
-                val dmb = det(p.x, b.x, p.y, b.y)
-                val dam = det(a.x, p.x, a.y, p.y)
-                if (dmb % dab == BigDecimal.ZERO && dam % dab == BigDecimal.ZERO) {
-                    Play(dmb / dab, dam / dab)
-                } else null
-            } catch (e: Exception) {
-                null
-            }
-        }
-    }
-    data class Play(
-        val a: BigDecimal,
-        val b: BigDecimal
-    ) {
-        val cost = a + a + a + b
-    }
-
-    private fun parseButton(input: String): LongVector {
-        return buttonRegex.matchEntire(input)!!
+    private fun parseValues(input: String): Pair<BigDecimal, BigDecimal> {
+        return regex.matchEntire(input)!!
             .groupValues
-            .let { (_, x, y) -> LongVector(x.toBigDecimal(), y.toBigDecimal()) }
-    }
-    private fun parsePrize(input: String): LongVector {
-        return prizeRegex.matchEntire(input)!!
-            .groupValues
-            .let { (_, x, y) -> LongVector(x.toBigDecimal(), y.toBigDecimal()) }
+            .let { (_, x, y) -> x.toBigDecimal() to y.toBigDecimal() }
     }
 
+    private val three = BigDecimal("3")
     override fun process(part: QuizPart, lines: Sequence<String>): BigDecimal {
-        val offset = if (part == QuizPart.B) LongVector(BigDecimal("10000000000000"), BigDecimal("10000000000000")) else LongVector(
-            BigDecimal.ZERO, BigDecimal.ZERO)
+        val offset = if (part == QuizPart.B) BigDecimal("10000000000000") else BigDecimal.ZERO
         return lines
             .split { it.isEmpty() }
             .map { machineLines ->
@@ -69,13 +30,12 @@ class Day13: AbstractLinesAdventDay<BigDecimal>() {
                 require(machineLines[0].startsWith("Button A: "))
                 require(machineLines[1].startsWith("Button B: "))
                 require(machineLines[2].startsWith("Prize: "))
-                Machine(
-                    a = parseButton(machineLines[0]),
-                    b = parseButton(machineLines[1]),
-                    p = parsePrize(machineLines[2]) + offset
-                )
+                val a = parseValues(machineLines[0])
+                val b = parseValues(machineLines[1])
+                val p = parseValues(machineLines[2])
+                Matrix(2, 2, listOf(a.first, b.first, a.second, b.second)) to listOf(p.first + offset, p.second + offset)
             }
-            .mapNotNull { it.solve() }
-            .sumOf { it.cost }
+            .mapNotNull { (coefficients, results) -> Equations.cramer(coefficients, results) }
+            .sumOf { (a, b) -> a * three + b }
     }
 }
