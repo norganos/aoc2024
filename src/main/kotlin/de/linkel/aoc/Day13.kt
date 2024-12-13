@@ -32,30 +32,12 @@ class Day13: AbstractLinesAdventDay<BigDecimal>() {
             fun det(a: BigDecimal, b: BigDecimal, c: BigDecimal, d: BigDecimal)
                 = a * d - b * c
             return try {
-                val ax = a.x
-                val ay = a.y
-                val bx = b.x
-                val by = b.y
-                val mx = p.x
-                val my = p.y
-
-                val dab = det(ax, bx, ay, by)
-                val dmb = det(mx, bx, my, by)
-                val dam = det(ax, mx, ay, my)
+                val dab = det(a.x, b.x, a.y, b.y)
+                val dmb = det(p.x, b.x, p.y, b.y)
+                val dam = det(a.x, p.x, a.y, p.y)
                 if (dmb % dab == BigDecimal.ZERO && dam % dab == BigDecimal.ZERO) {
-                    val a = dmb / dab
-                    val b = dam / dab
-                    Play(a, b)
+                    Play(dmb / dab, dam / dab)
                 } else null
-
-
-
-
-//                val b = (my - ((ay * mx) / ax)) / (by - ((ay * bx) / ax))
-//                val a = (mx - bx * b) / ax
-//
-//                Play(a, b)
-//                    .takeIf { it.a >= BigDecimal.ZERO && it.b >= BigDecimal.ZERO && it.wins(this) }
             } catch (e: Exception) {
                 null
             }
@@ -66,8 +48,6 @@ class Day13: AbstractLinesAdventDay<BigDecimal>() {
         val b: BigDecimal
     ) {
         val cost = a + a + a + b
-        fun wins(machine: Machine): Boolean
-            = machine.a * a + machine.b * b == machine.p
     }
 
     private fun parseButton(input: String): LongVector {
@@ -79,21 +59,6 @@ class Day13: AbstractLinesAdventDay<BigDecimal>() {
         return prizeRegex.matchEntire(input)!!
             .groupValues
             .let { (_, x, y) -> LongVector(x.toBigDecimal(), y.toBigDecimal()) }
-    }
-
-    private fun findBestPlay(machine: Machine): Play? {
-        var bestPlay: Play? = null
-        (0..100).forEach { aPresses ->
-            (0..100).forEach { bPresses ->
-                val play = Play(aPresses.toBigDecimal(), bPresses.toBigDecimal())
-                if (play.wins(machine)) {
-                    if (bestPlay?.takeIf { it.cost < play.cost } == null) {
-                        bestPlay = play
-                    }
-                }
-            }
-        }
-        return bestPlay
     }
 
     override fun process(part: QuizPart, lines: Sequence<String>): BigDecimal {
@@ -112,17 +77,7 @@ class Day13: AbstractLinesAdventDay<BigDecimal>() {
                     p = parsePrize(machineLines[2]) + offset
                 )
             }
-            .mapNotNull {
-                val solved = it.solve()
-                if (part == QuizPart.A && solved == null) {
-                    val brute = findBestPlay(it)
-                    if (brute != null) {
-                        println("$it -> $solved / $brute")
-                        it.solve()
-                    }
-                }
-                solved
-            }
+            .mapNotNull { it.solve() }
             .sumOf { it.cost }
     }
 }
