@@ -2,12 +2,10 @@ package de.linkel.aoc
 
 import de.linkel.aoc.base.AbstractLinesAdventDay
 import de.linkel.aoc.base.QuizPart
-import de.linkel.aoc.utils.geometry.plain.discrete.Dimension
 import de.linkel.aoc.utils.geometry.plain.discrete.Vector
 import de.linkel.aoc.utils.geometry.plain.discrete.Point
 import de.linkel.aoc.utils.geometry.plain.discrete.Rectangle
 import jakarta.inject.Singleton
-import java.io.File
 
 @Singleton
 class Day14: AbstractLinesAdventDay<Long>() {
@@ -47,55 +45,44 @@ class Day14: AbstractLinesAdventDay<Long>() {
                         area.width / 2, area.height / 2
                     ),
                 )
+                val evolve: (Pair<Point, Vector>) -> Pair<Point, Vector> = { (p, v) ->
+                    (p + v) % area to v
+                }
 
                 if (part == QuizPart.A) {
                     robots
-                        .transform(100) { list, i ->
-                            list.map { (p, v) ->
-                                (p + v) % area to v
-                            }
+                        .transform(100) { list, _ ->
+                            list.map(evolve)
                         }
-                        .mapNotNull { (p, _) ->
-                            destAreas.firstOrNull { p in it }
-                        }
-                        .groupingBy { it }
-                        .eachCount()
-                        .entries
-                        .fold(1L) { p, e -> p * e.value }
+                        .safetyFactor(destAreas)
                 } else {
-                    val pre = if (robots.size < 20) "e" else "s"
-                    robots
-                        // visually (using the txt files below) found first match at 7131 (then cycling with length 10403)
-                        .transform(7132) { list, i ->
-                            list
-                                .map { (p, v) ->
-                                    (p + v) % area to v
-                                }
-                                .also { rrr ->
-                                    if (File(pre).exists())
-                                        File("$pre/${i.toString().padStart(6, '0')}.txt").writer().use { w ->
-                                            rrr
-                                                .map { it.first }
-                                                .distinct()
-                                                .sortedWith(compareBy({ it.y }, { it.x }))
-                                                .fold(Point.ZERO) { last, p ->
-                                                    (p.y - last.y).times {
-                                                        w.append("\n")
-                                                    }
-                                                    (p.x - (last.x.takeIf { p.y == last.y } ?: 0)).times {
-                                                        w.append(" ")
-                                                    }
-                                                    w.append("#")
-                                                    p
-                                                }
-                                        }
-                                }
+                    data class State(
+                        val robots: List<Pair<Point, Vector>>,
+                        val lowestSafetyFactor: Pair<Int, Long> = 0 to robots.safetyFactor(destAreas)
+                    )
+                    (0 until area.area)
+                        .fold(State(robots)) { state, i ->
+                            val next = state.robots.map(evolve)
+                            val sf = next.safetyFactor(destAreas)
+                            State(
+                                robots = next,
+                                lowestSafetyFactor = if (sf < state.lowestSafetyFactor.second) (i+1) to sf else state.lowestSafetyFactor
+                            )
                         }
-                    // I hate myself for this...
-                    7132L
+                        .lowestSafetyFactor.first.toLong()
                 }
-
             }
+    }
+
+    private fun List<Pair<Point, Vector>>.safetyFactor(destAreas: List<Rectangle>): Long {
+        return this
+            .mapNotNull { (p, _) ->
+                destAreas.firstOrNull { p in it }
+            }
+            .groupingBy { it }
+            .eachCount()
+            .entries
+            .fold(1L) { p, e -> p * e.value }
     }
 
     private fun <T> T.transform(times: Int, lambda: (T, Int) -> T): T {
@@ -103,16 +90,6 @@ class Day14: AbstractLinesAdventDay<Long>() {
             .fold(this) { acc, i ->
             lambda(acc, i)
         }
-    }
-    private fun <T> List<T>.transformElements(times: Int, lambda: (T, Int) -> T): List<T> {
-        return (0 until times)
-            .fold(this) { acc, i ->
-            acc.map { lambda(it, i) }
-        }
-    }
-    private fun Int.times(lambda: (Int) -> Unit) {
-        return (0 until this)
-            .forEach(lambda)
     }
 
     private operator fun Point.rem(rect: Rectangle): Point {

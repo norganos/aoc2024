@@ -19,8 +19,8 @@ p=9,5 v=-3,-3
     override val solutionA = 229980828L
 
 //    override val exampleB = """
-//        """.trimIndent() 79952 90355 7131
-    override val exampleSolutionB = 7132L
+//        """.trimIndent()
+    override val exampleSolutionB = 7L // was not given in puzzle
     override val solutionB = 7132L
 
     override val implementation = Day14()
