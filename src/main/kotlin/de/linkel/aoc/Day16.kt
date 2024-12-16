@@ -34,7 +34,7 @@ class Day16: AbstractLinesAdventDay<Long>() {
             }
     }
 
-    fun dijkstra(grid: Grid<Char>, start: Point, end: Point): Pair<Set<List<Point>>, Long> {
+    private fun dijkstra(grid: Grid<Char>, start: Point, end: Point): Pair<Set<List<Point>>, Long> {
         val queue = PriorityQueue<Triple<List<Point>, Vector, Long>>(compareBy { it.third })
         queue.add(Triple(listOf(start), Vector.EAST, 0L))
         // if I remove the Vector from the key, it produces wrong result on my input (example works though)
