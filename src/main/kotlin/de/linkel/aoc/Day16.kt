@@ -2,13 +2,54 @@ package de.linkel.aoc
 
 import de.linkel.aoc.base.AbstractLinesAdventDay
 import de.linkel.aoc.base.QuizPart
+import de.linkel.aoc.utils.geometry.plain.discrete.Point
+import de.linkel.aoc.utils.geometry.plain.discrete.Vector
+import de.linkel.aoc.utils.grid.Grid
 import jakarta.inject.Singleton
+import java.util.*
 
 @Singleton
 class Day16: AbstractLinesAdventDay<Long>() {
     override val day = 16
 
     override fun process(part: QuizPart, lines: Sequence<String>): Long {
-        return lines.count().toLong()
+        var start: Point = Point.ZERO
+        var end: Point = Point.ZERO
+        val maze = Grid
+            .parse(lines) { pos, char ->
+                char
+                    .also { if (it == 'S') start = pos }
+                    .also { if (it == 'E') end = pos }
+                    .takeIf { it == '#' }
+            }
+        return dijkstra(maze, start, end) ?: 0L
     }
+
+    fun dijkstra(grid: Grid<Char>, start: Point, end: Point): Long? {
+        val queue = PriorityQueue<Triple<Point, Vector, Long>>(compareBy { it.third })
+        queue.add(Triple(start, Vector.EAST, 0L))
+        // if I remove the Vector from the key, it produces wrong result on my input (example works though)
+        // took me 45min to pinpoint that problem, yet not sure, why...
+        val visited = mutableMapOf<Pair<Point, Vector>, Long>()
+        while (queue.isNotEmpty()) {
+            val (point, direction, cost) = queue.poll()
+            if (point == end)
+                return cost
+            if (visited[point to direction] != null && visited[point to direction]!! < cost)
+                continue
+            visited[point to direction] = cost
+            listOf(
+                direction to 1L,
+                direction.turnClockwise() to 1001L,
+                direction.turnCounterClockwise() to 1001L
+            )
+                .map { (dir, stepCost) -> Triple(point + dir, dir, cost + stepCost) }
+                .filter { grid[point] != '#' }
+                .forEach {
+                    queue.add(it)
+                }
+        }
+        return null
+    }
+
 }
