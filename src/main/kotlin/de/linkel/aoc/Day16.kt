@@ -22,19 +22,37 @@ class Day16: AbstractLinesAdventDay<Long>() {
                     .also { if (it == 'E') end = pos }
                     .takeIf { it == '#' }
             }
-        return dijkstra(maze, start, end) ?: 0L
+        return dijkstra(maze, start, end)
+            .let { (paths, cost) ->
+                if (part == QuizPart.A)
+                    cost
+                else
+                    paths.flatten()
+                        .toSet()
+                        .size
+                        .toLong()
+            }
     }
 
-    fun dijkstra(grid: Grid<Char>, start: Point, end: Point): Long? {
-        val queue = PriorityQueue<Triple<Point, Vector, Long>>(compareBy { it.third })
-        queue.add(Triple(start, Vector.EAST, 0L))
+    fun dijkstra(grid: Grid<Char>, start: Point, end: Point): Pair<Set<List<Point>>, Long> {
+        val queue = PriorityQueue<Triple<List<Point>, Vector, Long>>(compareBy { it.third })
+        queue.add(Triple(listOf(start), Vector.EAST, 0L))
         // if I remove the Vector from the key, it produces wrong result on my input (example works though)
         // took me 45min to pinpoint that problem, yet not sure, why...
         val visited = mutableMapOf<Pair<Point, Vector>, Long>()
+        val bestPaths = mutableSetOf<List<Point>>()
+        var bestCost = Long.MAX_VALUE
         while (queue.isNotEmpty()) {
-            val (point, direction, cost) = queue.poll()
-            if (point == end)
-                return cost
+            val (trail, direction, cost) = queue.poll()
+            val point = trail.last()
+            if (point == end) {
+                // we will never have late arrivals at the end with a higher score, so no the < is the first arrival case
+                if (cost <= bestCost) {
+                    bestPaths.add(trail)
+                    bestCost = cost
+                } else
+                    break
+            }
             if (visited[point to direction] != null && visited[point to direction]!! < cost)
                 continue
             visited[point to direction] = cost
@@ -43,13 +61,13 @@ class Day16: AbstractLinesAdventDay<Long>() {
                 direction.turnClockwise() to 1001L,
                 direction.turnCounterClockwise() to 1001L
             )
-                .map { (dir, stepCost) -> Triple(point + dir, dir, cost + stepCost) }
+                .map { (dir, stepCost) -> Triple(trail + (point + dir), dir, cost + stepCost) }
                 .filter { grid[point] != '#' }
                 .forEach {
                     queue.add(it)
                 }
         }
-        return null
+        return bestPaths to bestCost
     }
 
 }
