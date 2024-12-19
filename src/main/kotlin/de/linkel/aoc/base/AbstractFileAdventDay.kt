@@ -32,7 +32,7 @@ abstract class AbstractFileAdventDay<T>: AdventDay<T> {
     }
 
     private fun callProcess(puzzle: PuzzleRun, reader: BufferedReader): T {
-        println("solving AoC 2023 Day $day ${puzzle.part} ${if (puzzle.example) " example" else ""}")
+        println("solving AoC 2023 Day $day ${puzzle.part} ${if (puzzle.example) "example" else ""}")
         val result = measureTimedValue {
             process(puzzle, reader)
         }
