@@ -62,7 +62,8 @@ class Day16: AbstractLinesAdventDay<Long>() {
                 direction.turnCounterClockwise() to 1001L
             )
                 .map { (dir, stepCost) -> Triple(trail + (point + dir), dir, cost + stepCost) }
-                .filter { grid[point] != '#' }
+                .filter { grid[it.first.last()] != '#' }
+                .filter { it.first.last() to it.second !in visited }
                 .forEach {
                     queue.add(it)
                 }
