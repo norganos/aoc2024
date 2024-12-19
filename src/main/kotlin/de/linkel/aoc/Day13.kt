@@ -1,7 +1,7 @@
 package de.linkel.aoc
 
 import de.linkel.aoc.base.AbstractLinesAdventDay
-import de.linkel.aoc.base.QuizPart
+import de.linkel.aoc.base.PuzzleRun
 import de.linkel.aoc.utils.iterables.split
 import de.linkel.aoc.utils.math.algebra.Equations
 import de.linkel.aoc.utils.math.algebra.Matrix
@@ -21,8 +21,8 @@ class Day13: AbstractLinesAdventDay<BigDecimal>() {
     }
 
     private val three = BigDecimal("3")
-    override fun process(part: QuizPart, lines: Sequence<String>): BigDecimal {
-        val offset = if (part == QuizPart.B) BigDecimal("10000000000000") else BigDecimal.ZERO
+    override fun process(puzzle: PuzzleRun, lines: Sequence<String>): BigDecimal {
+        val offset = if (puzzle.isB()) BigDecimal("10000000000000") else BigDecimal.ZERO
         return lines
             .split { it.isEmpty() }
             .map { machineLines ->

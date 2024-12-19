@@ -1,7 +1,7 @@
 package de.linkel.aoc
 
 import de.linkel.aoc.base.AbstractLinesAdventDay
-import de.linkel.aoc.base.QuizPart
+import de.linkel.aoc.base.PuzzleRun
 import de.linkel.aoc.utils.geometry.plain.discrete.Vector
 import de.linkel.aoc.utils.geometry.plain.discrete.Point
 import de.linkel.aoc.utils.geometry.plain.discrete.Rectangle
@@ -12,7 +12,7 @@ class Day14: AbstractLinesAdventDay<Long>() {
     override val day = 14
 
     private val regex = Regex("""^p=(-?\d+),\s?(-?\d+)\s?v=(-?\d+),\s?(-?\d+)$""")
-    override fun process(part: QuizPart, lines: Sequence<String>): Long {
+    override fun process(puzzle: PuzzleRun, lines: Sequence<String>): Long {
         return lines
             .map { line ->
                 regex.matchEntire(line)!!
@@ -23,7 +23,7 @@ class Day14: AbstractLinesAdventDay<Long>() {
             }
             .toList()
             .let { robots ->
-                val area = if (robots.size < 20)
+                val area = if (puzzle.example)
                     Rectangle(0, 0, 11, 7)
                 else
                     Rectangle(0, 0, 101, 103)
@@ -49,7 +49,7 @@ class Day14: AbstractLinesAdventDay<Long>() {
                     (p + v) % area to v
                 }
 
-                if (part == QuizPart.A) {
+                if (puzzle.isA()) {
                     robots
                         .transform(100) { list, _ ->
                             list.map(evolve)

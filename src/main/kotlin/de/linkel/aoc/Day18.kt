@@ -1,7 +1,7 @@
 package de.linkel.aoc
 
 import de.linkel.aoc.base.AbstractLinesAdventDay
-import de.linkel.aoc.base.QuizPart
+import de.linkel.aoc.base.PuzzleRun
 import de.linkel.aoc.utils.geometry.plain.discrete.Point
 import de.linkel.aoc.utils.geometry.plain.discrete.Rectangle
 import de.linkel.aoc.utils.geometry.plain.discrete.Vector
@@ -14,24 +14,24 @@ import java.util.*
 class Day18: AbstractLinesAdventDay<String>() {
     override val day = 18
 
-    override fun process(part: QuizPart, lines: Sequence<String>): String {
-        val lines = lines.toList()
-        val area = if (lines.count() < 30) Rectangle(0, 0, 7, 7) else Rectangle(0,0, 71, 71)
-        return if (part == QuizPart.A) {
-            val steps = if (lines.count() < 30) 12 else 1024
-            simulate(lines, area, steps).toString()
+    override fun process(puzzle: PuzzleRun, lines: Sequence<String>): String {
+        val bytes = lines.toList()
+        val area = if (puzzle.example) Rectangle(0, 0, 7, 7) else Rectangle(0,0, 71, 71)
+        return if (puzzle.isA()) {
+            val steps = if (bytes.count() < 30) 12 else 1024
+            simulate(bytes, area, steps).toString()
         } else {
-            var free = if (lines.count() < 30) 12 else 1024
-            var blocked = lines.count()
+            var free = if (bytes.count() < 30) 12 else 1024
+            var blocked = bytes.count()
             while (true) {
                 if (free + 1 == blocked) break
                 val steps = free + (blocked - free) / 2
-                val res = simulate(lines, area, steps)
+                val res = simulate(bytes, area, steps)
                 if (res == -1L)
                     blocked = steps
                 else free = steps
             }
-            return lines[free]
+            return bytes[free]
         }
     }
 

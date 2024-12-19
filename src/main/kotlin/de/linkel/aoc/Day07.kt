@@ -1,7 +1,7 @@
 package de.linkel.aoc
 
 import de.linkel.aoc.base.AbstractLinesAdventDay
-import de.linkel.aoc.base.QuizPart
+import de.linkel.aoc.base.PuzzleRun
 import jakarta.inject.Singleton
 
 @Singleton
@@ -50,8 +50,8 @@ class Day07: AbstractLinesAdventDay<Long>() {
         return false
     }
 
-    override fun process(part: QuizPart, lines: Sequence<String>): Long {
-        val operators = if (part == QuizPart.A) listOf(Plus, Times) else listOf(Plus, Times, Concat)
+    override fun process(puzzle: PuzzleRun, lines: Sequence<String>): Long {
+        val operators = if (puzzle.isA()) listOf(Plus, Times) else listOf(Plus, Times, Concat)
         return lines
             .map { line ->
                 val tv = line.substringBefore(":").toLong()

@@ -1,7 +1,7 @@
 package de.linkel.aoc
 
 import de.linkel.aoc.base.AbstractFileAdventDay
-import de.linkel.aoc.base.QuizPart
+import de.linkel.aoc.base.PuzzleRun
 import jakarta.inject.Singleton
 import java.io.BufferedReader
 import kotlin.math.min
@@ -49,7 +49,7 @@ class Day09: AbstractFileAdventDay<Long>() {
                 = (id % 10).toString().repeat(length)
     }
 
-    override fun process(part: QuizPart, reader: BufferedReader): Long {
+    override fun process(puzzle: PuzzleRun, reader: BufferedReader): Long {
         val disk = reader
             .charSequence()
             .foldIndexed(0L to emptyList<Blocks>()) { index, (offset, list), c ->
@@ -65,7 +65,7 @@ class Day09: AbstractFileAdventDay<Long>() {
                     offset to list
                 }
             }.second.toMutableList()
-        if (part == QuizPart.A) {
+        if (puzzle.isA()) {
             while (true) {
                 while (disk.last() is FreeBlock) {
                     disk.removeLast()

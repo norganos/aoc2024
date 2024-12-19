@@ -1,7 +1,7 @@
 package de.linkel.aoc
 
 import de.linkel.aoc.base.AbstractLinesAdventDay
-import de.linkel.aoc.base.QuizPart
+import de.linkel.aoc.base.PuzzleRun
 import de.linkel.aoc.utils.iterables.inTwoBlocks
 import jakarta.inject.Singleton
 
@@ -50,7 +50,7 @@ class Day17: AbstractLinesAdventDay<String>() {
         }
     }
 
-    override fun process(part: QuizPart, lines: Sequence<String>): String {
+    override fun process(puzzle: PuzzleRun, lines: Sequence<String>): String {
         return lines.inTwoBlocks(
             delimiterPredicate = { it.isEmpty() },
             block1 = { block ->
@@ -73,7 +73,7 @@ class Day17: AbstractLinesAdventDay<String>() {
                         .split(",")
                         .map { it.toInt() }
                         .toList()
-                if (part == QuizPart.A) {
+                if (puzzle.isA()) {
                     reg.run(prg)
                     reg.output.joinToString(",")
                 } else {

@@ -1,39 +1,23 @@
 package de.linkel.aoc
 
 import de.linkel.aoc.base.AbstractLinesAdventDay
-import de.linkel.aoc.base.QuizPart
-import de.linkel.aoc.utils.geometry.plain.discrete.Point
-import de.linkel.aoc.utils.geometry.plain.discrete.Vector
+import de.linkel.aoc.base.PuzzleRun
 import de.linkel.aoc.utils.grid.Grid
 import de.linkel.aoc.utils.grid.inside
 import de.linkel.aoc.utils.iterables.permutations
-import de.linkel.aoc.utils.math.CommonMath
 import jakarta.inject.Singleton
-import kotlin.math.sign
 
 @Singleton
 class Day08: AbstractLinesAdventDay<Long>() {
     override val day = 8
 
-    override fun process(part: QuizPart, lines: Sequence<String>): Long {
-        // Grid.parse currently auto-crops :-/
-        return lines
-            .filter { it.isNotEmpty() }
-            .flatMapIndexed { y, line ->
-                line.toCharArray()
-                    .mapIndexed { x, c -> Point(x, y) to c }
-            }
-            .fold(Grid<Char>()) { grid, (point, char) ->
-                grid.stretchTo(point)
-                if (char != '.')
-                    grid[point] = char
-                grid
-            }
+    override fun process(puzzle: PuzzleRun, lines: Sequence<String>): Long {
+        return Grid.parse(lines, crop = false) { _, char -> char.takeIf { it != '.' } }
             .let { grid ->
                 grid.getAllData()
                     .groupBy { it.data }
                     .mapValues { (_, values) -> values.map { it.point } }
-                    .flatMap { (c, antennas) ->
+                    .flatMap { (_, antennas) ->
                         antennas
                             .permutations(2)
                             .filter { it.size == 2 }
@@ -41,7 +25,7 @@ class Day08: AbstractLinesAdventDay<Long>() {
                             .toSet()
                             .map { it.first() to it.last() }
                             .flatMap { (a, b) ->
-                                if (part == QuizPart.A)
+                                if (puzzle.isA())
                                     listOf(
                                         a + (a - b),
                                         b + (b - a),
@@ -61,20 +45,3 @@ class Day08: AbstractLinesAdventDay<Long>() {
     }
 }
 
-private fun Vector.min(): Vector {
-    return if (deltaX == 0) Vector(deltaX = 0, deltaY = deltaY.sign)
-    else if (deltaY == 0) Vector(deltaX = deltaX.sign, deltaY = 0)
-    else {
-        val gcd = CommonMath.gcd(deltaX, deltaY)
-        Vector(deltaX / gcd, deltaY / gcd)
-    }
-}
-private fun Grid<Char>.straightLine(start: Point, direction: Vector): List<Point> {
-    val result = mutableListOf<Point>()
-    var pos = start
-    while (pos in boundingBox) {
-        result.add(pos)
-        pos += direction
-    }
-    return result
-}

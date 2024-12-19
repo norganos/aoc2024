@@ -3,11 +3,11 @@ package de.linkel.aoc.base
 import java.io.BufferedReader
 
 abstract class AbstractLinesAdventDay<T>: AbstractFileAdventDay<T>() {
-    override fun process(part: QuizPart, reader: BufferedReader): T {
+    override fun process(puzzle: PuzzleRun, reader: BufferedReader): T {
         return reader.useLines { sequence ->
-            process(part, sequence)
+            process(puzzle, sequence)
         }
     }
 
-    protected abstract fun process(part: QuizPart, lines: Sequence<String>): T
+    protected abstract fun process(puzzle: PuzzleRun, lines: Sequence<String>): T
 }

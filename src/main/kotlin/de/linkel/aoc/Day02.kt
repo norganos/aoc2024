@@ -1,7 +1,7 @@
 package de.linkel.aoc
 
 import de.linkel.aoc.base.AbstractLinesAdventDay
-import de.linkel.aoc.base.QuizPart
+import de.linkel.aoc.base.PuzzleRun
 import de.linkel.aoc.utils.iterables.withoutIndex
 import jakarta.inject.Singleton
 import kotlin.math.abs
@@ -15,8 +15,8 @@ class Day02: AbstractLinesAdventDay<Long>() {
                 && levels.zipWithNext { a, b -> abs(a-b) }.all { it in 1..3 }
     }
 
-    override fun process(part: QuizPart, lines: Sequence<String>): Long {
-        return if (part == QuizPart.A)
+    override fun process(puzzle: PuzzleRun, lines: Sequence<String>): Long {
+        return if (puzzle.isA())
             lines
                 .map { line -> line.split(" ").map { it.toLong() } }
                 .count { isReportSafe(it) }.toLong()

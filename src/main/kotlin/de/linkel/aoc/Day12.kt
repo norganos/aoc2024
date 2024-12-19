@@ -1,12 +1,11 @@
 package de.linkel.aoc
 
 import de.linkel.aoc.base.AbstractLinesAdventDay
-import de.linkel.aoc.base.QuizPart
+import de.linkel.aoc.base.PuzzleRun
 import de.linkel.aoc.utils.geometry.plain.discrete.Point
 import de.linkel.aoc.utils.geometry.plain.discrete.Vector
 import de.linkel.aoc.utils.grid.Grid
 import jakarta.inject.Singleton
-import java.util.stream.IntStream.IntMapMultiConsumer
 
 @Singleton
 class Day12: AbstractLinesAdventDay<Long>() {
@@ -18,7 +17,7 @@ class Day12: AbstractLinesAdventDay<Long>() {
         val perimeter: Int,
         val sides: Int,
     )
-    override fun process(part: QuizPart, lines: Sequence<String>): Long {
+    override fun process(puzzle: PuzzleRun, lines: Sequence<String>): Long {
         val grid = Grid.parse(lines) { pos, char -> char }
         val regions = mutableListOf<Region>()
         val grid2 = grid.copy()
@@ -50,14 +49,15 @@ class Day12: AbstractLinesAdventDay<Long>() {
                 .filter { (_, o) -> o !in grid.boundingBox || grid[o] != value }
             val perimeter2 = perimeter.toMutableSet()
             val sides = mutableListOf<Pair<Vector, Set<Point>>>()
+            // effectively it's the same again, refactoring necessary
             while (perimeter2.isNotEmpty()) {
-                val current = mutableSetOf<Point>()
-                val start = perimeter2.first()
-                val side = start.first
-                var boundary = setOf(start.second)
-                while (boundary.isNotEmpty()) {
-                    current.addAll(boundary)
-                    boundary = boundary
+                val current2 = mutableSetOf<Point>()
+                val start2 = perimeter2.first()
+                val side = start2.first
+                var boundary2 = setOf(start2.second)
+                while (boundary2.isNotEmpty()) {
+                    current2.addAll(boundary2)
+                    boundary2 = boundary2
                         .flatMap {
                             listOf(
                                 it + side.turnClockwise(),
@@ -67,18 +67,18 @@ class Day12: AbstractLinesAdventDay<Long>() {
                         .map { side to it }
                         .filter { it in perimeter2 }
                         .map { it.second }
-                        .filter { it !in current }
+                        .filter { it !in current2 }
                         .toSet()
                 }
-                sides.add(side to current)
-                perimeter2.removeAll(current.map { side to it }.toSet())
+                sides.add(side to current2)
+                perimeter2.removeAll(current2.map { side to it }.toSet())
             }
             regions.add(
                 Region(value = value, area = area, perimeter = perimeter.size, sides = sides.size)
             )
             current.clear()
         }
-        return if (part == QuizPart.A)
+        return if (puzzle.isA())
             regions.sumOf { it.area.toLong() * it.perimeter.toLong() }
         else
             regions.sumOf { it.area.toLong() * it.sides.toLong() }

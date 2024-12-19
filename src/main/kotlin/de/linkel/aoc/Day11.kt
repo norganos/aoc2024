@@ -1,7 +1,7 @@
 package de.linkel.aoc
 
 import de.linkel.aoc.base.AbstractLinesAdventDay
-import de.linkel.aoc.base.QuizPart
+import de.linkel.aoc.base.PuzzleRun
 import jakarta.inject.Singleton
 
 @Singleton
@@ -36,8 +36,8 @@ class Day11: AbstractLinesAdventDay<Long>() {
     }
 
     private val whitespace = Regex("\\s+")
-    override fun process(part: QuizPart, lines: Sequence<String>): Long {
-        val iterations = (if (part == QuizPart.A) 25 else 75)
+    override fun process(puzzle: PuzzleRun, lines: Sequence<String>): Long {
+        val iterations = (if (puzzle.isA()) 25 else 75)
         return lines.sumOf { line ->
             line
                 .split(whitespace)

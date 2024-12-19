@@ -1,7 +1,7 @@
 package de.linkel.aoc
 
 import de.linkel.aoc.base.AbstractLinesAdventDay
-import de.linkel.aoc.base.QuizPart
+import de.linkel.aoc.base.PuzzleRun
 import de.linkel.aoc.utils.geometry.plain.discrete.Point
 import de.linkel.aoc.utils.grid.Grid
 import jakarta.inject.Singleton
@@ -10,14 +10,14 @@ import jakarta.inject.Singleton
 class Day10: AbstractLinesAdventDay<Long>() {
     override val day = 10
 
-    override fun process(part: QuizPart, lines: Sequence<String>): Long {
+    override fun process(puzzle: PuzzleRun, lines: Sequence<String>): Long {
         return Grid.parse(lines) { pos, char -> char.digitToInt() }
             .let { grid ->
                 grid.getAllData()
                     .filter { it.data == 0 }
                     .flatMap { hike(grid, listOf(it.point)) }
                     .let { trails ->
-                        if (part == QuizPart.A)
+                        if (puzzle.isA())
                             trails
                                 .map { it.first() to it.last() }
                                 .toSet()

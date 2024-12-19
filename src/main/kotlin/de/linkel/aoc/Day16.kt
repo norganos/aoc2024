@@ -1,7 +1,7 @@
 package de.linkel.aoc
 
 import de.linkel.aoc.base.AbstractLinesAdventDay
-import de.linkel.aoc.base.QuizPart
+import de.linkel.aoc.base.PuzzleRun
 import de.linkel.aoc.utils.geometry.plain.discrete.Point
 import de.linkel.aoc.utils.geometry.plain.discrete.Vector
 import de.linkel.aoc.utils.grid.Grid
@@ -12,7 +12,7 @@ import java.util.*
 class Day16: AbstractLinesAdventDay<Long>() {
     override val day = 16
 
-    override fun process(part: QuizPart, lines: Sequence<String>): Long {
+    override fun process(puzzle: PuzzleRun, lines: Sequence<String>): Long {
         var start: Point = Point.ZERO
         var end: Point = Point.ZERO
         val maze = Grid
@@ -24,7 +24,7 @@ class Day16: AbstractLinesAdventDay<Long>() {
             }
         return dijkstra(maze, start, end)
             .let { (paths, cost) ->
-                if (part == QuizPart.A)
+                if (puzzle.isA())
                     cost
                 else
                     paths.flatten()

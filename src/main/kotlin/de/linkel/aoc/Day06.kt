@@ -1,7 +1,7 @@
 package de.linkel.aoc
 
 import de.linkel.aoc.base.AbstractLinesAdventDay
-import de.linkel.aoc.base.QuizPart
+import de.linkel.aoc.base.PuzzleRun
 import de.linkel.aoc.utils.geometry.plain.discrete.Point
 import de.linkel.aoc.utils.geometry.plain.discrete.Vector
 import de.linkel.aoc.utils.grid.Grid
@@ -22,7 +22,7 @@ class Day06: AbstractLinesAdventDay<Long>() {
     class Obstacle
 
 
-    override fun process(part: QuizPart, lines: Sequence<String>): Long {
+    override fun process(puzzle: PuzzleRun, lines: Sequence<String>): Long {
         val path = mutableListOf<Guard>()
         val grid = Grid.parse(lines) { pos, char ->
             when (char) {
@@ -51,7 +51,7 @@ class Day06: AbstractLinesAdventDay<Long>() {
                 }
         }
         path.removeLast()
-        return if (part == QuizPart.A) {
+        return if (puzzle.isA()) {
             path.map { it.position }.toSet().size.toLong()
         } else {
             try {

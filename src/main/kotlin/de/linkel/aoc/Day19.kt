@@ -1,7 +1,7 @@
 package de.linkel.aoc
 
 import de.linkel.aoc.base.AbstractLinesAdventDay
-import de.linkel.aoc.base.QuizPart
+import de.linkel.aoc.base.PuzzleRun
 import de.linkel.aoc.utils.iterables.inTwoBlocks
 import jakarta.inject.Singleton
 
@@ -9,7 +9,7 @@ import jakarta.inject.Singleton
 class Day19: AbstractLinesAdventDay<Long>() {
     override val day = 19
 
-    override fun process(part: QuizPart, lines: Sequence<String>): Long {
+    override fun process(puzzle: PuzzleRun, lines: Sequence<String>): Long {
         return lines
             .inTwoBlocks(
                 delimiterPredicate = { it.isEmpty() },
@@ -19,7 +19,7 @@ class Day19: AbstractLinesAdventDay<Long>() {
                         .toSet()
                 },
                 block2 = { towels, blockLines ->
-                    if (part == QuizPart.A)
+                    if (puzzle.isA())
                         blockLines
                             .count {
                                 this.testDesign(towels, it) >= 1L

@@ -21,26 +21,26 @@ abstract class AbstractFileAdventDay<T>: AdventDay<T> {
 
     override fun solve(part: QuizPart, args: List<String>): T {
         return getInput(part, args).use { reader ->
-            callProcess(part, reader)
+            callProcess(PuzzleRun(part, false), reader)
         }
     }
 
     override fun test(part: QuizPart, input: String): T {
         return input.reader().buffered(min(max(1, input.length), 1024)).use { reader ->
-            callProcess(part, reader)
+            callProcess(PuzzleRun(part, true), reader)
         }
     }
 
-    private fun callProcess(part: QuizPart, reader: BufferedReader): T {
-        println("solving AoC 2023 Day $day $part")
+    private fun callProcess(puzzle: PuzzleRun, reader: BufferedReader): T {
+        println("solving AoC 2023 Day $day ${puzzle.part} ${if (puzzle.example) " example" else ""}")
         val result = measureTimedValue {
-            process(part, reader)
+            process(puzzle, reader)
         }
         println("Solution is ${result.value}")
         println ("calculation took ${msFormat.format(result.duration.inWholeMicroseconds / 1000F)}ms")
         return result.value
     }
 
-    protected abstract fun process(part: QuizPart, reader: BufferedReader): T
+    protected abstract fun process(puzzle: PuzzleRun, reader: BufferedReader): T
 
 }

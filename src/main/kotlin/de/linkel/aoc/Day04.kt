@@ -1,7 +1,7 @@
 package de.linkel.aoc
 
 import de.linkel.aoc.base.AbstractLinesAdventDay
-import de.linkel.aoc.base.QuizPart
+import de.linkel.aoc.base.PuzzleRun
 import de.linkel.aoc.utils.geometry.plain.discrete.Point
 import de.linkel.aoc.utils.geometry.plain.discrete.Vector
 import de.linkel.aoc.utils.grid.Grid
@@ -11,8 +11,8 @@ import jakarta.inject.Singleton
 class Day04: AbstractLinesAdventDay<Long>() {
     override val day = 4
 
-    override fun process(part: QuizPart, lines: Sequence<String>): Long {
-        return if (part == QuizPart.A)
+    override fun process(puzzle: PuzzleRun, lines: Sequence<String>): Long {
+        return if (puzzle.isA())
             partA(lines)
         else
             partB(lines)

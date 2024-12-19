@@ -1,7 +1,7 @@
 package de.linkel.aoc
 
 import de.linkel.aoc.base.AbstractLinesAdventDay
-import de.linkel.aoc.base.QuizPart
+import de.linkel.aoc.base.PuzzleRun
 import jakarta.inject.Singleton
 
 @Singleton
@@ -74,14 +74,14 @@ class Day05: AbstractLinesAdventDay<Long>() {
         }
     }
 
-    override fun process(part: QuizPart, lines: Sequence<String>): Long {
+    override fun process(puzzle: PuzzleRun, lines: Sequence<String>): Long {
         return lines.twoBlocks("", { rLines ->
             rLines.map { line ->
                 line.substringBefore("|").toLong() to line.substringAfterLast("|").toLong()
             }.toList()
         }, { rules, pLines ->
             val comparator = PageComparator(rules)
-            if (part == QuizPart.A) {
+            if (puzzle.isA()) {
                 pLines
                     .map { line -> line.split(",").map(String::toLong) }
                     .filter { pages ->
